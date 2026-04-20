@@ -41,6 +41,7 @@ Pour plus de details sur les flux autorises et interdits, consulter `docs/archit
 
 - [Architecture detaillee](docs/architecture.md)
 - [Flux reseau](docs/network_flows.md)
+- [Gestion de Configuration avec Ansible](docs/setup_ansible.md)
 - [Guide d'installation du pare-feu](docs/setup_gateway.md)
 - [Guide d'installation du Bastion VPN](docs/setup_wireguard.md)
 - [Guide d'installation du DNS et de l'Annuaire](docs/setup_dns_ldap.md)
