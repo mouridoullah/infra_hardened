@@ -44,6 +44,7 @@ Pour plus de details sur les flux autorises et interdits, consulter `docs/archit
 - [Guide d'installation du pare-feu](docs/setup_gateway.md)
 - [Guide d'installation du Bastion VPN](docs/setup_wireguard.md)
 - [Guide d'installation du DNS et de l'Annuaire](docs/setup_dns_ldap.md)
+- [Mise en Place de l'Observabilite](docs/setup_monitoring.md)
 - [Scripts de maintenance](scripts/)
 
 ## Licence
