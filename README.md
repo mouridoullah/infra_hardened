@@ -42,6 +42,7 @@ Pour plus de details sur les flux autorises et interdits, consulter `docs/archit
 - [Architecture detaillee](docs/architecture.md)
 - [Flux reseau](docs/network_flows.md)
 - [Guide d'installation du pare-feu](docs/setup_gateway.md)
+- [Guide d'installation du Bastion VPN](docs/setup_wireguard.md)
 - [Scripts de maintenance](scripts/)
 
 ## Licence
