@@ -13,30 +13,30 @@ Concevoir une infrastructure reseau hybride ultra-securisee simulant un environn
 
       [ INTERNET / WAN ]
               |
-              | (Port UDP/51820 - VPN WireGuard) [cite: 30, 164]
-              | (Ports TCP/80, 443 - HTTP/S) [cite: 165]
+              | (Port UDP/51820 - VPN WireGuard)
+              | (Ports TCP/80, 443 - HTTP/S)
               v
       +-----------------+
-      |    FW-GW01      | <--- (Rôle: Routeur/Pare-feu Nftables) [cite: 11, 138]
-      |  (Le Douanier)  |      (Policy: FORWARD DROP) [cite: 4, 155, 157]
+      |    FW-GW01      | <--- (Rôle: Routeur/Pare-feu Nftables)
+      |  (Le Douanier)  |      (Policy: FORWARD DROP)
       +-------+---------+
               |
       +-------+---------------------------+---------------------------+
       |       |                           |                           |
       |   [ ZONE DMZ ]              [ ZONE LAN ]              [ ZONE MGMT ]
-      | (172.16.50.0/24)          (192.168.100.0/24)        (192.168.56.0/24) [cite: 149]
+      | (172.16.50.0/24)          (192.168.100.0/24)        (192.168.56.0/24)
       |       |                           |                           |
       |       +-- [edge-access01]         +-- [infra01]               +-- [Host PC]
-      |       |   (.10) [cite: 147, 28]         |   (.10) [cite: 146, 191]        |   (Admin)
-      |       |   (WireGuard) [cite: 12, 27]    |   (DNS/LDAP) [cite: 15, 189]    |
+      |       |   (.10)                        |   (.10)                   |   (Admin)
+      |       |   (WireGuard)                  |   (DNS/LDAP)              |
       |       |                           |                           |
       |       +-- [proxy01]               +-- [mgmt01]                |
-      |           (.20) [cite: 147, 198]        |   (.50) [cite: 146, 191]        |
-      |           (Nginx) [cite: 14, 160]       |   (Ansible) [cite: 17, 60]      |
+      |           (.20)                        |   (.50)                   |
+      |           (Nginx)                      |   (Ansible)               |
       |                                   |                           |
       |                                   +-- [secops01]              |
-      |                                   |   (.100) [cite: 146, 101]     |
-      |                                   |   (Loki/Grafana) [cite: 18, 100]  |
+      |                                   |   (.100)                      |
+      |                                   |   (Loki/Grafana)             |
       |                                   |                           |
       |                                   +-- [Windows-VM] <--- (Optionnelle)
       |                                       (.11) (Audit/Workstation)
@@ -47,12 +47,13 @@ Concevoir une infrastructure reseau hybride ultra-securisee simulant un environn
 FLUX RÉSEAU CRITIQUES (MATRICE DE SÉCURITÉ)
 ------------------------------------------------------------------------------------------
 
-1.  VPN ACCESS : [WAN] --(UDP/51820)--> [FW-GW01] --(DNAT)--> [Edge-Access] [cite: 30, 164]
-2.  ADMIN PKI  : [PC Admin] --(WireGuard)--> [Edge] --(SSH)--> [Mgmt01] [cite: 90, 92]
-3.  LOGS PUSH  : [DMZ Hosts] --(TCP/3100)--> [FW-GW01] --(Allow)--> [SecOps01] [cite: 104, 158]
-4.  DNS/LDAP   : [DMZ/LAN] --(UDP/53, TCP/636)--> [FW-GW01] --(Allow)--> [Infra01] [cite: 157, 158]
-5.  MAINTENANCE: [Mgmt01] --(TCP/22)--> [Tous les serveurs] (Ansible Orchestration) [cite: 65, 80]
+1.  VPN ACCESS : [WAN] --(UDP/51820)--> [FW-GW01] --(DNAT)--> [Edge-Access]
+2.  ADMIN PKI  : [PC Admin] --(WireGuard)--> [Edge] --(SSH)--> [Mgmt01]
+3.  LOGS PUSH  : [DMZ Hosts] --(TCP/3100)--> [FW-GW01] --(Allow)--> [SecOps01]
+4.  DNS/LDAP   : [DMZ/LAN] --(UDP/53, TCP/636)--> [FW-GW01] --(Allow)--> [Infra01]
+5.  MAINTENANCE: [Mgmt01] --(TCP/22)--> [Tous les serveurs] (Ansible Orchestration)
 ------------------------------------------------------------------------------------------
+
 ```
 
 ## Points Cles de l'Architecture
