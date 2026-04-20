@@ -113,7 +113,7 @@ clients:
     tenant_id: corp_prod
     basic_auth:
       username: admin
-      password: Bayedame1476
+      password: motDePasseFort
 
 scrape_configs:
   - job_name: system
