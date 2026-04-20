@@ -113,7 +113,7 @@ Une fois le tunnel etabli depuis le client, les tests suivants confirment le bon
 | :------------------------------------------- | :----------------------------------------------- | :------------------------ |
 | **1. Ping de l'interface VPN du serveur**    | `ping 10.8.0.1`                                  | Reponse                   |
 | **2. Acces SSH au serveur d'administration** | `ssh user@192.168.100.50`                        | Connexion etablie         |
-| **3. Verification de la table de routage**   | `ip route show | grep 192.168`                   | `192.168.100.0/24 dev wg0` |
+| **3. Verification de la table de routage**   | `ip route show \| grep 192.168`                   | `192.168.100.0/24 dev wg0` |
 
 ## 8. Propriete de Furtivite de WireGuard (Silence Cryptographique)
 
