@@ -1,4 +1,4 @@
-# Hardened Enterprise Lab (V5)
+# Hardened Enterprise Lab
 
 ## Objectif
 
@@ -8,13 +8,13 @@ Concevoir une infrastructure reseau hybride ultra-securisee simulant un environn
 
 ```text
 ==========================================================================================
-                      INFRASTRUCTURE RÉSEAU DURCIE "CORP.LOCAL"
+                      INFRASTRUCTURE RÉSEAU DURCIE "CORP.LOCAL" (V5.1)
 ==========================================================================================
 
       [ INTERNET / WAN ]
               |
       +-------+---------+
-      |    FW-GW01      | <--- NAT / Forwarding / Nftables
+      |    FW-GW01      | <--- (Relais DHCP / NAT / Nftables) 
       +-------+---------+
               |
       +-------+---------------------------+---------------------------+
@@ -22,28 +22,36 @@ Concevoir une infrastructure reseau hybride ultra-securisee simulant un environn
       |   [ ZONE DMZ ]              [ ZONE LAN ]              [ ZONE MGMT ]
       | (172.16.50.0/24)          (192.168.100.0/24)        (192.168.56.0/24)
       |       |                           |                           |
-      |       +-- [edge-access01]         +-- [infra01]               +-- [Admin PC]
-      |       |   (.10) VPN               |   (.10)                   |
-      |       |                           |   (DNS Bind9)             |
-      |       +-- [proxy01]               |   (LDAP Slapd)            |
-      |           (.20) Nginx             |   (DHCP Kea) <----[Nouveau]|
-      |                                   |                           |
-      |                                   +-- [mgmt01]                |
-      |                                   |   (.50)                   |
-      |                                   |   (Ansible)               |
-      |                                   |   (CA Root / PKI) <-------[Nouveau]
-      |                                   |                           |
-      |                                   +-- [secops01]              |
-      |                                       (.100) Loki/Grafana     |
-      +---------------------------------------------------------------+
+      |       +-- [edge-access01]         +-- [infra01] (.10)         +-- [Admin PC]
+      |       |   (.10) VPN                      |   - DNS (Bind9)            |   (SSH/VPN)
+      |       |                                  |   - LDAP (Slapd)           |
+      |       +-- [proxy01]                      |   - DHCP (Kea)             |
+      |           (.20) Nginx                    |                            |
+      |                                          +-- [ca01] (.20)             |
+      |                                          |   - PKI (Step-CA)          |
+      |                                          |                            |
+      |                                          +-- [mgmt01] (.50)           |
+      |                                          |   - Ansible Master         |
+      |                                          |                            |
+      |                                          +-- [secops01] (.100)        |
+      |                                              - Loki/Grafana           |
+      +-----------------------------------------------------------------------+
 
-------------------------------------------------------------------------------------------
-INTEROPÉRABILITÉ DES SERVICES :
-------------------------------------------------------------------------------------------
-1. PKI  : Mgmt01 génère les certificats -> Diffusés via Ansible vers Proxy/Infra/SecOps.
-2. DHCP : Infra01 (Kea) écoute les requêtes DHCP Discover via le relais du Gateway.
-3. DNS  : Résolution des noms internes pour tous les serveurs du parc.
-------------------------------------------------------------------------------------------
+
+==========================================================================================
+INTEROPÉRABILITÉ & FLUX RÉSEAU CRITIQUES
+==========================================================================================
+
+1. PKI        : CA01 émet les certificats. Ansible (Mgmt01) les diffuse vers le Reverse Proxy (HTTPS) et LDAP (LDAPS).
+2. DHCP       : Le Gateway (FW-GW01) sert de "DHCP Relay" pour rediriger les requêtes Discover du LAN vers Infra01 (Kea).
+3. DNS        : Résolution Bind9 centralisée sur Infra01 pour tout le parc.
+4. VPN ACCESS : [WAN] --(UDP/51820)--> [FW-GW01] --(DNAT)--> [Edge-Access]
+5. ADMIN PKI  : [PC Admin] --(WireGuard)--> [Edge] --(SSH)--> [Mgmt01]
+6. LOGS PUSH  : [DMZ Hosts] --(TCP/3100)--> [FW-GW01] --(Allow)--> [SecOps01]
+7. DNS/LDAP   : [DMZ/LAN] --(UDP/53, TCP/636)--> [FW-GW01] --(Allow)--> [Infra01]
+8. MAINTENANCE: [Mgmt01] --(TCP/22)--> [Tous les serveurs] (Ansible Orchestration)
+==========================================================================================
+
 
 ```
 
@@ -57,13 +65,13 @@ INTEROPÉRABILITÉ DES SERVICES :
 ## Structure du Depot
 
 ```text
-infra_hardened/
-├── docs/                 
-├── scripts/                
-├── ansible/                
+infra_hardened
+├── docs             
+├── scripts                
+├── ansible                
 │   ├── hosts.ini
 │   └── site.yml
-├── diagrams/               
+├── diagrams               
 └── README.md
 ```
 
