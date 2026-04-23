@@ -8,17 +8,13 @@ Concevoir une infrastructure reseau hybride ultra-securisee simulant un environn
 
 ```text
 ==========================================================================================
-                      INFRASTRUCTURE RÉSEAU DURCIE "CORP.LOCAL" (V5)
+                      INFRASTRUCTURE RÉSEAU DURCIE "CORP.LOCAL"
 ==========================================================================================
 
       [ INTERNET / WAN ]
               |
-              | (Port UDP/51820 - VPN WireGuard)
-              | (Ports TCP/80, 443 - HTTP/S)
-              v
-      +-----------------+
-      |    FW-GW01      | <--- (Rôle: Routeur/Pare-feu Nftables)
-      |  (Le Douanier)  |      (Policy: FORWARD DROP)
+      +-------+---------+
+      |    FW-GW01      | <--- NAT / Forwarding / Nftables
       +-------+---------+
               |
       +-------+---------------------------+---------------------------+
@@ -26,32 +22,27 @@ Concevoir une infrastructure reseau hybride ultra-securisee simulant un environn
       |   [ ZONE DMZ ]              [ ZONE LAN ]              [ ZONE MGMT ]
       | (172.16.50.0/24)          (192.168.100.0/24)        (192.168.56.0/24)
       |       |                           |                           |
-      |       +-- [edge-access01]         +-- [infra01]               +-- [Host PC]
-      |       |   (.10)                        |   (.10)                   |   (Admin)
-      |       |   (WireGuard)                  |   (DNS/LDAP)              |
-      |       |                           |                           |
-      |       +-- [proxy01]               +-- [mgmt01]                |
-      |           (.20)                        |   (.50)                   |
-      |           (Nginx)                      |   (Ansible)               |
+      |       +-- [edge-access01]         +-- [infra01]               +-- [Admin PC]
+      |       |   (.10) VPN               |   (.10)                   |
+      |       |                           |   (DNS Bind9)             |
+      |       +-- [proxy01]               |   (LDAP Slapd)            |
+      |           (.20) Nginx             |   (DHCP Kea) <----[Nouveau]|
+      |                                   |                           |
+      |                                   +-- [mgmt01]                |
+      |                                   |   (.50)                   |
+      |                                   |   (Ansible)               |
+      |                                   |   (CA Root / PKI) <-------[Nouveau]
       |                                   |                           |
       |                                   +-- [secops01]              |
-      |                                   |   (.100)                      |
-      |                                   |   (Loki/Grafana)             |
-      |                                   |                           |
-      |                                   +-- [Windows-VM] <--- (Optionnelle)
-      |                                       (.11) (Audit/Workstation)
-      |                                                               |
+      |                                       (.100) Loki/Grafana     |
       +---------------------------------------------------------------+
 
 ------------------------------------------------------------------------------------------
-FLUX RÉSEAU CRITIQUES (MATRICE DE SÉCURITÉ)
+INTEROPÉRABILITÉ DES SERVICES :
 ------------------------------------------------------------------------------------------
-
-1.  VPN ACCESS : [WAN] --(UDP/51820)--> [FW-GW01] --(DNAT)--> [Edge-Access]
-2.  ADMIN PKI  : [PC Admin] --(WireGuard)--> [Edge] --(SSH)--> [Mgmt01]
-3.  LOGS PUSH  : [DMZ Hosts] --(TCP/3100)--> [FW-GW01] --(Allow)--> [SecOps01]
-4.  DNS/LDAP   : [DMZ/LAN] --(UDP/53, TCP/636)--> [FW-GW01] --(Allow)--> [Infra01]
-5.  MAINTENANCE: [Mgmt01] --(TCP/22)--> [Tous les serveurs] (Ansible Orchestration)
+1. PKI  : Mgmt01 génère les certificats -> Diffusés via Ansible vers Proxy/Infra/SecOps.
+2. DHCP : Infra01 (Kea) écoute les requêtes DHCP Discover via le relais du Gateway.
+3. DNS  : Résolution des noms internes pour tous les serveurs du parc.
 ------------------------------------------------------------------------------------------
 
 ```
