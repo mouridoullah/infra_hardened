@@ -8,7 +8,7 @@ Concevoir une infrastructure reseau hybride ultra-securisee simulant un environn
 
 ```text
 ==========================================================================================
-                      INFRASTRUCTURE RÉSEAU DURCIE "CORP.LOCAL" (V5.1)
+                      INFRASTRUCTURE RÉSEAU DURCIE "CORP.LOCAL"
 ==========================================================================================
 
       [ INTERNET / WAN ]
